@@ -3,7 +3,6 @@ import { writeFile, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { supabase } from '../../utils/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,8 +101,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabaseClient = supabase as SupabaseClient<any>;
-    const { data, error } = await supabaseClient
+    const supabaseClient = supabase;
+    const { data, error } = await supabaseClient!
       .from('tutor_submissions')
       .insert({
         first_name: firstName,

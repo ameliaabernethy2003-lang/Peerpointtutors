@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../utils/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark submission as processed and accepted in database
-    const supabaseClient = supabase as SupabaseClient<any>;
-    const { error: updateError } = await supabaseClient
+    const supabaseClient = supabase;
+    const { error: updateError } = await supabaseClient!
       .from('tutor_submissions')
       .update({
         processed: true,
