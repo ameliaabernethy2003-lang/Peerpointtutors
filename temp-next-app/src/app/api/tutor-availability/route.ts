@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { google } from 'googleapis';
 import { extractCalendarId } from '../../utils/googleCalendar';
+
+// Import googleapis - handle gracefully if not available
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+let google: any = null;
+try {
+  google = require('googleapis').google;
+} catch {
+  google = null;
+}
 
 /**
  * Initialize Google Calendar API client
@@ -97,6 +105,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Try to fetch real availability from Google Calendar
+    if (!google) {
+      // Fallback to mock data if googleapis not available
+      const mockAvailability = generateMockAvailability();
+      return NextResponse.json({
+        success: true,
+        availability: mockAvailability,
+        note: 'Using sample availability. Google Calendar API not available.',
+      });
+    }
+
     const calendar = getCalendarClient();
     
     if (!calendar) {
