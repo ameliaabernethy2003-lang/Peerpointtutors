@@ -1,12 +1,12 @@
 'use client';
 
 const companies = [
-  { name: 'Acme Realty Group', sector: 'Commercial', marketCap: '$2.5B', debtRatio: '0.35', rating: 'A+' },
-  { name: 'Metro Properties Inc', sector: 'Residential', marketCap: '$1.8B', debtRatio: '0.42', rating: 'A' },
-  { name: 'Urban Development Co', sector: 'Mixed Use', marketCap: '$3.2B', debtRatio: '0.38', rating: 'A+' },
-  { name: 'Coastal Real Estate', sector: 'Hospitality', marketCap: '$1.2B', debtRatio: '0.45', rating: 'A-' },
-  { name: 'Prime Holdings LLC', sector: 'Commercial', marketCap: '$4.1B', debtRatio: '0.32', rating: 'AA-' },
-  { name: 'Summit Properties', sector: 'Residential', marketCap: '$2.9B', debtRatio: '0.40', rating: 'A' },
+  { name: 'Patagonia', sector: 'Outdoor Apparel', marketCap: '$3.0B', debtRatio: '0.15', rating: 'A+' },
+  { name: 'The North Face (VF Corp)', sector: 'Outdoor Apparel', marketCap: '$5.2B', debtRatio: '0.28', rating: 'A' },
+  { name: 'Columbia Sportswear', sector: 'Outdoor Apparel', marketCap: '$4.8B', debtRatio: '0.22', rating: 'A+' },
+  { name: 'Deckers Outdoor', sector: 'Footwear & Apparel', marketCap: '$12.5B', debtRatio: '0.18', rating: 'AA-' },
+  { name: 'Peloton', sector: 'Fitness Equipment', marketCap: '$1.5B', debtRatio: '0.45', rating: 'B+' },
+  { name: 'Lululemon', sector: 'Athletic Apparel', marketCap: '$38.2B', debtRatio: '0.12', rating: 'AA' },
 ];
 
 export default function CompatibleCompaniesTable() {
