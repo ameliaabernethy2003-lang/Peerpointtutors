@@ -13,8 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Real Estate Dashboard",
-  description: "Professional real estate financial dashboard",
+  title: {
+    default: "PeerPointTutors",
+    template: "%s | PeerPointTutors",
+  },
+  description: "Peer-to-peer college tutoring platform",
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
