@@ -3,7 +3,6 @@ import { writeFile, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { supabase } from '../../utils/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,7 +101,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabaseClient = supabase as SupabaseClient;
+    // TypeScript type narrowing: we know supabase is not null after the check above
+    const supabaseClient = supabase as any;
     const { data, error } = await supabaseClient
       .from('tutor_submissions')
       .insert({

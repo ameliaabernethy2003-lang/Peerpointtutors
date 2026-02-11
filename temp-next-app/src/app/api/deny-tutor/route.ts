@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../utils/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark submission as processed but not accepted
-    const supabaseClient = supabase as SupabaseClient;
+    // TypeScript type narrowing: we know supabase is not null after the check above
+    const supabaseClient = supabase as any;
     const { error } = await supabaseClient
       .from('tutor_submissions')
       .update({
