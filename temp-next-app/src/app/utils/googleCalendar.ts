@@ -223,7 +223,7 @@ export async function cancelCalendarEvent(
 
         // Try to find event matching the booking
         // Look for events with booking ID or tutor name in description/summary/attendees
-        const matchingEvent = events.find((event) => {
+        const matchingEvent = events.find((event: any) => {
           const summary = (event.summary || '').toLowerCase();
           const description = (event.description || '').toLowerCase();
           const location = (event.location || '').toLowerCase();
