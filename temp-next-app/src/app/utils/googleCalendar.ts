@@ -51,7 +51,7 @@ export function getCalendarClient() {
     });
 
     // Ensure tokens are refreshed automatically
-    oauth2Client.on('tokens', (tokens) => {
+    oauth2Client.on('tokens', (tokens: any) => {
       if (tokens.refresh_token) {
         console.log('🔄 New refresh token received');
       }
