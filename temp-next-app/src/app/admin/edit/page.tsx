@@ -24,7 +24,7 @@ type Submission = {
   processed?: boolean;
 };
 
-const ADMIN_PASSWORD = 'SG&A'; // Change this to your desired admin password
+const ADMIN_PASSWORD = 'SG&A2026!'; // Change this to your desired admin password
 const ADMIN_VENMO_USERNAME = 'peerpointtutors'; // Admin's Venmo username - make sure you're logged into Venmo with this account when paying tutors
 
 type Tutor = {
