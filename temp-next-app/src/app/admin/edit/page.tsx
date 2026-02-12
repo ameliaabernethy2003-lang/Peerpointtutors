@@ -24,7 +24,7 @@ type Submission = {
   processed?: boolean;
 };
 
-const ADMIN_PASSWORD = 'pro'; // Admin password - case sensitive
+const ADMIN_PASSWORD = 'admin123'; // Admin password
 const ADMIN_VENMO_USERNAME = 'peerpointtutors'; // Admin's Venmo username - make sure you're logged into Venmo with this account when paying tutors
 
 type Tutor = {
@@ -95,7 +95,9 @@ export default function AdminEditPage() {
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === ADMIN_PASSWORD) {
+    // Trim whitespace and compare
+    const trimmedInput = passwordInput.trim();
+    if (trimmedInput === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       setPasswordError('');
       setPasswordInput('');
