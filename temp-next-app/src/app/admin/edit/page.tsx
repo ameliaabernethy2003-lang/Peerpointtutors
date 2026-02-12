@@ -24,7 +24,6 @@ type Submission = {
   processed?: boolean;
 };
 
-const ADMIN_PASSWORD = 'admin123'; // Admin password
 const ADMIN_VENMO_USERNAME = 'peerpointtutors'; // Admin's Venmo username - make sure you're logged into Venmo with this account when paying tutors
 
 type Tutor = {
@@ -46,9 +45,6 @@ type Tutor = {
 };
 
 export default function AdminEditPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [allTutors, setAllTutors] = useState<Record<string, Record<string, Tutor[]>>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -80,31 +76,22 @@ export default function AdminEditPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      if (activeTab === 'pending') {
-        fetchSubmissions();
-      } else if (activeTab === 'database') {
-        fetchAllTutors();
-      } else if (activeTab === 'bookings' || activeTab === 'verified-sessions') {
-        fetchBookings();
-      } else if (activeTab === 'payments') {
-        fetchPayments();
-      }
+    if (activeTab === 'pending') {
+      fetchSubmissions();
+    } else if (activeTab === 'database') {
+      fetchAllTutors();
+    } else if (activeTab === 'bookings' || activeTab === 'verified-sessions') {
+      fetchBookings();
+    } else if (activeTab === 'payments') {
+      fetchPayments();
     }
-  }, [isAuthenticated, activeTab]);
+  }, [activeTab]);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Trim whitespace and compare
-    const trimmedInput = passwordInput.trim();
-    if (trimmedInput === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setPasswordError('');
-      setPasswordInput('');
-    } else {
-      setPasswordError('Incorrect password. Please try again.');
-    }
-  };
+  useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/deafbf18-19d4-4d69-863c-cb432df50c87',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({runId:'remove-admin-password',hypothesisId:'H1',location:'src/app/admin/edit/page.tsx:component-mount',message:'Admin page mounted without password gate',data:{pathname:typeof window !== 'undefined' ? window.location.pathname : null,passwordGateEnabled:false},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+  }, []);
 
   const fetchSubmissions = async () => {
     setIsLoading(true);
@@ -479,58 +466,6 @@ export default function AdminEditPage() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 text-neutral-900">
-        <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 text-[10px] font-semibold text-white">
-                PPT
-              </div>
-              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-neutral-500">
-                Admin Edit Mode
-              </span>
-            </div>
-          </div>
-          <h1 className="mb-2 text-xl font-semibold text-neutral-900">
-            Enter admin password
-          </h1>
-          <p className="mb-6 text-sm text-neutral-600">
-            This is the owner-only edit mode. Enter the admin password to access
-            pending tutor applications and edit the website.
-          </p>
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
-                Admin Password
-              </label>
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={(e) => {
-                  setPasswordInput(e.target.value);
-                  if (passwordError) setPasswordError('');
-                }}
-                className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-800 focus:ring-1 focus:ring-neutral-800"
-                placeholder="Enter admin password"
-              />
-              {passwordError && (
-                <p className="mt-2 text-xs text-red-500">{passwordError}</p>
-              )}
-            </div>
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center rounded-full bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black"
-            >
-              Access Edit Mode
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -549,12 +484,9 @@ export default function AdminEditPage() {
               • Edit Mode
             </span>
           </div>
-          <button
-            onClick={() => setIsAuthenticated(false)}
-            className="text-xs font-medium text-neutral-600 hover:text-neutral-900"
-          >
-            Logout
-          </button>
+          <span className="text-xs font-medium text-neutral-600">
+            No login required
+          </span>
         </div>
       </header>
 
