@@ -44,7 +44,12 @@ type Tutor = {
   submittedAt?: string;
 };
 
+const ADMIN_PASSWORD = 'SG&A2026!';
+
 export default function AdminEditPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [allTutors, setAllTutors] = useState<Record<string, Record<string, Tutor[]>>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +59,47 @@ export default function AdminEditPage() {
   const [editingTutor, setEditingTutor] = useState<Tutor | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Tutor>>({});
   const [tutorSearchQuery, setTutorSearchQuery] = useState<string>('');
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput.trim() === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setPasswordError('');
+    } else {
+      setPasswordError('Incorrect password');
+    }
+  };
+
+  // Show password gate if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 shadow-sm w-full max-w-sm">
+          <h1 className="text-2xl font-bold text-neutral-900 mb-2">Admin Access</h1>
+          <p className="text-sm text-neutral-500 mb-6">Enter the password to continue</p>
+          <form onSubmit={handlePasswordSubmit}>
+            <input
+              type="password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              placeholder="Enter password"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-900 focus:border-transparent mb-3"
+              autoFocus
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm mb-3">{passwordError}</p>
+            )}
+            <button
+              type="submit"
+              className="w-full bg-neutral-900 text-white py-2 px-4 rounded-lg hover:bg-neutral-800 transition-colors font-medium"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   const openTutorCalendar = async (booking: any) => {
     try {
@@ -87,11 +133,6 @@ export default function AdminEditPage() {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/deafbf18-19d4-4d69-863c-cb432df50c87',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({runId:'remove-admin-password',hypothesisId:'H1',location:'src/app/admin/edit/page.tsx:component-mount',message:'Admin page mounted without password gate',data:{pathname:typeof window !== 'undefined' ? window.location.pathname : null,passwordGateEnabled:false},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-  }, []);
 
   const fetchSubmissions = async () => {
     setIsLoading(true);
