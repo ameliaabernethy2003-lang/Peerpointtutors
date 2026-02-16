@@ -4,8 +4,8 @@ let createClient: any = null;
 try {
   const supabaseModule = require('@supabase/supabase-js');
   createClient = supabaseModule.createClient;
-} catch (e) {
-  console.warn('Supabase package not available:', e);
+} catch {
+  // Supabase package not available - app will use local JSON file storage
 }
 
 // Initialize Supabase client
@@ -23,13 +23,8 @@ if (createClient && supabaseUrl && supabaseAnonKey) {
     supabaseUrl,
     process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
   );
-} else {
-  if (!createClient) {
-    console.warn('Supabase package not installed. Database features will not work.');
-  } else {
-    console.warn('Supabase environment variables are not set. Database features will not work.');
-  }
 }
+// No warning needed - app falls back to local JSON file storage automatically
 
 export { supabase, supabaseAdmin };
 
