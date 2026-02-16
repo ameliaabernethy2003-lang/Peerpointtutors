@@ -70,37 +70,6 @@ export default function AdminEditPage() {
     }
   };
 
-  // Show password gate if not authenticated
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="bg-white rounded-xl border border-neutral-200 p-8 shadow-sm w-full max-w-sm">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">Admin Access</h1>
-          <p className="text-sm text-neutral-500 mb-6">Enter the password to continue</p>
-          <form onSubmit={handlePasswordSubmit}>
-            <input
-              type="password"
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              placeholder="Enter password"
-              className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-900 focus:border-transparent mb-3"
-              autoFocus
-            />
-            {passwordError && (
-              <p className="text-red-500 text-sm mb-3">{passwordError}</p>
-            )}
-            <button
-              type="submit"
-              className="w-full bg-neutral-900 text-white py-2 px-4 rounded-lg hover:bg-neutral-800 transition-colors font-medium"
-            >
-              Login
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   const openTutorCalendar = async (booking: any) => {
     try {
       // Open Google Calendar as peerpointtutors@gmail.com
@@ -506,6 +475,37 @@ export default function AdminEditPage() {
       alert('Error updating tutor. Please try again.');
     }
   };
+
+  // Show password gate if not authenticated (placed after all hooks)
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 shadow-sm w-full max-w-sm">
+          <h1 className="text-2xl font-bold text-neutral-900 mb-2">Admin Access</h1>
+          <p className="text-sm text-neutral-500 mb-6">Enter the password to continue</p>
+          <form onSubmit={handlePasswordSubmit}>
+            <input
+              type="password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              placeholder="Enter password"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-900 focus:border-transparent mb-3"
+              autoFocus
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm mb-3">{passwordError}</p>
+            )}
+            <button
+              type="submit"
+              className="w-full bg-neutral-900 text-white py-2 px-4 rounded-lg hover:bg-neutral-800 transition-colors font-medium"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
