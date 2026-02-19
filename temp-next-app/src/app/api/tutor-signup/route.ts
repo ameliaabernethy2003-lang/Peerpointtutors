@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
 import { readJsonData, writeJsonData } from '../../utils/db';
+import { supabaseAdmin } from '../../utils/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,25 +23,56 @@ export async function POST(request: NextRequest) {
     const extracurriculars = formData.get('extracurriculars') as string;
     const rate = formData.get('rate') as string;
 
-    // Save headshot file (still using file system for images)
-    let headshotFilename = '';
+    // Upload headshot to Supabase Storage (persistent) or fallback to filesystem
     let headshotPath = '';
     if (headshot && headshot.size > 0) {
       const bytes = await headshot.arrayBuffer();
       const buffer = Buffer.from(bytes);
+      const fileExtension = headshot.name.split('.').pop();
+      const headshotFilename = `${firstName.trim()}_${lastName.trim()}_${Date.now()}.${fileExtension}`;
 
-      // Create public/uploads directory if it doesn't exist
-      const uploadsDir = join(process.cwd(), 'public', 'uploads', 'headshots');
-      if (!existsSync(uploadsDir)) {
-        await mkdir(uploadsDir, { recursive: true });
+      if (supabaseAdmin) {
+        try {
+          // Upload to Supabase Storage
+          const { error: uploadError } = await supabaseAdmin.storage
+            .from('headshots')
+            .upload(headshotFilename, buffer, {
+              contentType: headshot.type || 'image/jpeg',
+              upsert: true,
+            });
+
+          if (uploadError) {
+            console.error('Supabase storage upload error:', uploadError);
+          } else {
+            // Get the public URL
+            const { data: urlData } = supabaseAdmin.storage
+              .from('headshots')
+              .getPublicUrl(headshotFilename);
+            
+            headshotPath = urlData.publicUrl;
+          }
+        } catch (e) {
+          console.error('Supabase storage exception:', e);
+        }
       }
 
-      // Generate filename
-      const fileExtension = headshot.name.split('.').pop();
-      headshotFilename = `${firstName}_${lastName}_${Date.now()}.${fileExtension}`;
-      const filePath = join(uploadsDir, headshotFilename);
-      await writeFile(filePath, buffer);
-      headshotPath = `/uploads/headshots/${headshotFilename}`;
+      // Fallback: save to local filesystem if Supabase upload failed
+      if (!headshotPath) {
+        try {
+          const { writeFile, mkdir } = await import('fs/promises');
+          const { join } = await import('path');
+          const { existsSync } = await import('fs');
+          const uploadsDir = join(process.cwd(), 'public', 'uploads', 'headshots');
+          if (!existsSync(uploadsDir)) {
+            await mkdir(uploadsDir, { recursive: true });
+          }
+          const filePath = join(uploadsDir, headshotFilename);
+          await writeFile(filePath, buffer);
+          headshotPath = `/uploads/headshots/${headshotFilename}`;
+        } catch (fsError) {
+          console.error('Filesystem fallback error:', fsError);
+        }
+      }
     }
 
     // Read existing submissions
@@ -54,7 +83,6 @@ export async function POST(request: NextRequest) {
       id: `submission-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
       firstName,
       lastName,
-      headshotFilename: headshotFilename || null,
       headshotPath: headshotPath || null,
       internshipOrJob: internshipOrJob || null,
       company: company || null,
