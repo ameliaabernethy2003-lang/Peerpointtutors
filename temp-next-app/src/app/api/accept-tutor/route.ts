@@ -1,20 +1,97 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readFile, writeFile } from 'fs/promises';
+import { join } from 'path';
+import { existsSync } from 'fs';
 import { supabase } from '../../utils/supabase';
 
 export async function POST(request: NextRequest) {
   try {
     const submission = await request.json();
 
-    // If Supabase is not configured, return success (using local JSON files instead)
+    // Parse classes into arrays (needed for both Supabase and local storage)
+    const classesArray = (submission.classes || '')
+      .split(/[,\n]/)
+      .map((c: string) => c.trim())
+      .filter((c: string) => c.length > 0);
+
+    const coreCourses: string[] = [];
+    const financeCourses: string[] = [];
+    const accountingCourses: string[] = [];
+
+    classesArray.forEach((className: string) => {
+      const lower = className.toLowerCase();
+      if (lower.includes('accounting') && !lower.includes('foundations')) {
+        accountingCourses.push(className);
+      } else if (lower.includes('finance') && !lower.includes('foundations')) {
+        financeCourses.push(className);
+      } else {
+        coreCourses.push(className);
+      }
+    });
+
+    // If Supabase is not configured, use local JSON files
     if (!supabase) {
+      // 1. Mark submission as processed in tutor-submissions.json
+      const submissionsPath = join(process.cwd(), 'submissions', 'tutor-submissions.json');
+      try {
+        const content = await readFile(submissionsPath, 'utf-8');
+        const submissions = JSON.parse(content);
+        const updated = submissions.map((s: any) => {
+          if (s.submittedAt === submission.submittedAt || s.id === submission.id) {
+            return { ...s, processed: true, accepted: true };
+          }
+          return s;
+        });
+        await writeFile(submissionsPath, JSON.stringify(updated, null, 2), 'utf-8');
+      } catch (error) {
+        console.error('Error updating submissions file:', error);
+      }
+
+      // 2. Add tutor to accepted-tutors.json
+      const acceptedPath = join(process.cwd(), 'submissions', 'accepted-tutors.json');
+      let acceptedTutors: any[] = [];
+      try {
+        if (existsSync(acceptedPath)) {
+          const content = await readFile(acceptedPath, 'utf-8');
+          acceptedTutors = JSON.parse(content);
+          if (!Array.isArray(acceptedTutors)) acceptedTutors = [];
+        }
+      } catch {
+        acceptedTutors = [];
+      }
+
+      const newTutor = {
+        id: `dynamic-${submission.firstName}-${submission.lastName}-${Date.now()}`,
+        name: `${submission.firstName} ${submission.lastName}`,
+        shortLabel: submission.firstName,
+        major: submission.majors,
+        role: submission.internshipOrJob || '',
+        company: submission.company || '',
+        grade: submission.grade,
+        rate: submission.rate,
+        bookingUrl: submission.bookingUrl || '',
+        venmoUsername: submission.venmoUsername || '',
+        imageSrc: submission.headshotPath || '',
+        coreCourses: coreCourses.length > 0 ? coreCourses : undefined,
+        financeCourses: financeCourses.length > 0 ? financeCourses : undefined,
+        accountingCourses: accountingCourses.length > 0 ? accountingCourses : undefined,
+        extracurriculars: submission.extracurriculars || '',
+        college: submission.college,
+        school: (submission.college || '').includes('Notre Dame') ? 'University of Notre Dame' : 'Indiana University',
+        submittedAt: submission.submittedAt,
+        contactInformation: submission.contactInformation || '',
+      };
+
+      acceptedTutors.push(newTutor);
+      await writeFile(acceptedPath, JSON.stringify(acceptedTutors, null, 2), 'utf-8');
+
       return NextResponse.json(
-        { success: true, message: 'Tutor accepted (using local storage)' },
+        { success: true, message: 'Tutor accepted and added to database', tutorData: newTutor },
         { status: 200 }
       );
     }
 
-    // Mark submission as processed and accepted in database
-    // TypeScript type narrowing: we know supabase is not null after the check above
+    // Mark submission as processed and accepted in Supabase database
     const supabaseClient = supabase as any;
     const { error: updateError } = await supabaseClient
       .from('tutor_submissions')
@@ -31,34 +108,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    // Parse classes into arrays
-    const classesArray = submission.classes
-      .split(/[,\n]/)
-      .map((c: string) => c.trim())
-      .filter((c: string) => c.length > 0);
-
-    // Categorize classes
-    const coreCourses: string[] = [];
-    const financeCourses: string[] = [];
-    const accountingCourses: string[] = [];
-
-    classesArray.forEach((className: string) => {
-      const lower = className.toLowerCase();
-      if (
-        lower.includes('accounting') &&
-        !lower.includes('foundations')
-      ) {
-        accountingCourses.push(className);
-      } else if (
-        lower.includes('finance') &&
-        !lower.includes('foundations')
-      ) {
-        financeCourses.push(className);
-      } else {
-        coreCourses.push(className);
-      }
-    });
 
     // Save accepted tutor to database
     const { data: tutorData, error: insertError } = await supabaseClient

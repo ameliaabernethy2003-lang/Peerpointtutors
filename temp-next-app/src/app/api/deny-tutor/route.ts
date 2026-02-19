@@ -1,14 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readFile, writeFile } from 'fs/promises';
+import { join } from 'path';
 import { supabase } from '../../utils/supabase';
 
 export async function POST(request: NextRequest) {
   try {
     const { submittedAt } = await request.json();
 
-    // If Supabase is not configured, return success (using local JSON files instead)
+    // If Supabase is not configured, use local JSON files
     if (!supabase) {
+      // Mark submission as processed (denied) in tutor-submissions.json
+      const submissionsPath = join(process.cwd(), 'submissions', 'tutor-submissions.json');
+      try {
+        const content = await readFile(submissionsPath, 'utf-8');
+        const submissions = JSON.parse(content);
+        const updated = submissions.map((s: any) => {
+          if (s.submittedAt === submittedAt) {
+            return { ...s, processed: true, accepted: false };
+          }
+          return s;
+        });
+        await writeFile(submissionsPath, JSON.stringify(updated, null, 2), 'utf-8');
+      } catch (error) {
+        console.error('Error updating submissions file:', error);
+      }
+
       return NextResponse.json(
-        { success: true, message: 'Tutor denied (using local storage)' },
+        { success: true, message: 'Tutor denied' },
         { status: 200 }
       );
     }
