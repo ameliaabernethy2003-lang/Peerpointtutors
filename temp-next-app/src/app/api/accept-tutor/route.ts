@@ -56,9 +56,7 @@ export async function POST(request: NextRequest) {
       accountingCourses: accountingCourses.length > 0 ? accountingCourses : undefined,
       extracurriculars: submission.extracurriculars || '',
       college: submission.college,
-      school: (submission.college || '').includes('Notre Dame')
-        ? 'University of Notre Dame'
-        : 'Indiana University',
+      school: 'University of Notre Dame',
       submittedAt: submission.submittedAt,
       contactInformation: submission.contactInformation || '',
     };

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { calculateDisplayRate } from './utils/rateCalculator';
 
-type Step = 'hero' | 'school' | 'nd-colleges' | 'iu-coming-soon' | 'tutors' | 'search-results';
+type Step = 'hero' | 'school' | 'nd-colleges' | 'tutors' | 'search-results';
 
 type Tutor = {
   name: string;
@@ -767,7 +767,7 @@ export default function Home() {
       : null;
 
   const filteredSchools = useMemo(() => {
-    const SCHOOLS = ['University of Notre Dame', 'Indiana University'];
+    const SCHOOLS = ['University of Notre Dame'];
     if (!schoolQuery.trim()) return SCHOOLS;
     return SCHOOLS.filter((school) =>
       school.toLowerCase().includes(schoolQuery.toLowerCase()),
@@ -902,11 +902,7 @@ export default function Home() {
   const handleSelectSchool = (school: string) => {
     setSelectedSchool(school);
     setSelectedCollege(null);
-    if (school.startsWith('University of Notre Dame')) {
-      setStep('nd-colleges');
-    } else {
-      setStep('iu-coming-soon');
-    }
+    setStep('nd-colleges');
   };
 
   const handleSelectCollege = (college: string) => {
@@ -925,7 +921,6 @@ export default function Home() {
   const showBack =
     step === 'school' ||
     step === 'nd-colleges' ||
-    step === 'iu-coming-soon' ||
     step === 'tutors' ||
     step === 'search-results';
 
@@ -998,7 +993,7 @@ export default function Home() {
                   </span>
                 </button>
                 <div className="flex flex-col text-xs text-neutral-500">
-                  <span>Trusted by students at Notre Dame &amp; IU.</span>
+                  <span>Trusted by students at Notre Dame.</span>
                   <span>No subscriptions. Pay only when you book.</span>
                 </div>
               </div>
@@ -1033,8 +1028,7 @@ export default function Home() {
                       Which school are you at?
                     </h2>
                     <p className="text-sm text-neutral-600">
-                      Start typing to find your campus. For now, choose between
-                      Notre Dame and IU.
+                      Select your school to find peer tutors on your campus.
                     </p>
                     <div className="space-y-3">
                       <div className="relative">
@@ -1056,9 +1050,7 @@ export default function Home() {
                             <div>
                               <div className="font-medium">{school}</div>
                               <div className="text-xs text-neutral-500">
-                                {school === 'Indiana University' 
-                                  ? 'Coming soon to IU' 
-                                  : 'Verified peer tutors on campus'}
+                                {'Verified peer tutors on campus'}
                               </div>
                             </div>
                             <span className="text-base text-neutral-400">→</span>
@@ -1184,32 +1176,6 @@ export default function Home() {
                         </div>
                       </>
                     )}
-                  </div>
-                )}
-
-                {step === 'iu-coming-soon' && (
-                  <div className="space-y-5">
-                    <div className="space-y-1">
-                      <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
-                        Indiana University
-                      </p>
-                      <h2 className="text-lg font-semibold text-neutral-900">
-                        Coming soon to IU
-                      </h2>
-                    </div>
-                    <p className="text-sm text-neutral-600">
-                      We&apos;re finalizing our first cohort of IU tutors. For now,
-                      you can explore how the experience will look at Notre Dame.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleSelectSchool('University of Notre Dame')
-                      }
-                      className="rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-black"
-                    >
-                      Preview Notre Dame experience
-                    </button>
                   </div>
                 )}
 
@@ -2156,7 +2122,7 @@ export default function Home() {
                     onClick={() => {
                       if (step === 'school') {
                         setStep('hero');
-                      } else if (step === 'nd-colleges' || step === 'iu-coming-soon') {
+                      } else if (step === 'nd-colleges') {
                         setStep('school');
                       } else if (step === 'search-results') {
                         setClassSearchQuery('');
