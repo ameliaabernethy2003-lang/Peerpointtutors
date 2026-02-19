@@ -1,22 +1,10 @@
 import { NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData } from '../../utils/db';
 
 export async function GET() {
   try {
-    // Read accepted tutors from JSON file
-    const acceptedPath = join(process.cwd(), 'submissions', 'accepted-tutors.json');
-    
-    let acceptedTutors: any[] = [];
-    try {
-      const acceptedContent = await readFile(acceptedPath, 'utf-8');
-      acceptedTutors = JSON.parse(acceptedContent);
-    } catch {
-      // File doesn't exist, return empty
-      return NextResponse.json({ tutors: {} });
-    }
+    const acceptedTutors: any[] = await readJsonData('accepted-tutors');
 
-    // Transform to match expected format
     const tutors = acceptedTutors.map((tutor: any) => ({
       name: tutor.name,
       shortLabel: tutor.shortLabel || tutor.short_label || tutor.name.split(' ')[0],
@@ -37,7 +25,6 @@ export async function GET() {
       submittedAt: tutor.submittedAt || tutor.submitted_at,
     }));
 
-    // Group by college
     const tutorsByCollege: Record<string, any[]> = {};
     tutors.forEach((tutor: any) => {
       const college = tutor.college || 'Unknown';

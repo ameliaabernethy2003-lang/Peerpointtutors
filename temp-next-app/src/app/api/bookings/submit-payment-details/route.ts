@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData, writeJsonData } from '../../../utils/db';
 
-// Submit payment details for admin verification
 export async function POST(request: NextRequest) {
   try {
     const { bookingId, paymentAmount, venmoAddress } = await request.json();
@@ -14,24 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Read bookings from JSON file
-    const bookingsPath = join(process.cwd(), 'submissions', 'bookings.json');
-    let bookings: any[] = [];
-    
-    try {
-      const bookingsContent = await readFile(bookingsPath, 'utf-8');
-      bookings = JSON.parse(bookingsContent);
-      if (!Array.isArray(bookings)) {
-        bookings = [];
-      }
-    } catch {
-      return NextResponse.json(
-        { success: false, message: 'Bookings file not found' },
-        { status: 404 }
-      );
-    }
-
-    // Find booking
+    const bookings: any[] = await readJsonData('bookings');
     const bookingIndex = bookings.findIndex((b) => b.bookingId === bookingId);
 
     if (bookingIndex === -1) {
@@ -50,27 +31,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if expired
     if (new Date(booking.expiresAt) < new Date()) {
       bookings[bookingIndex].status = 'expired';
-      await writeFile(bookingsPath, JSON.stringify(bookings, null, 2), 'utf-8');
+      await writeJsonData('bookings', bookings);
       return NextResponse.json(
         { success: false, message: 'Booking has expired' },
         { status: 400 }
       );
     }
 
-    // Store payment details - status remains pending until admin verifies
     bookings[bookingIndex] = {
       ...booking,
       paymentAmount: parseFloat(paymentAmount),
       venmoAddress: venmoAddress.trim(),
       paymentDetailsSubmittedAt: new Date().toISOString(),
-      // Status remains 'pending' - admin must verify
     };
 
-    // Write back to file
-    await writeFile(bookingsPath, JSON.stringify(bookings, null, 2), 'utf-8');
+    await writeJsonData('bookings', bookings);
 
     return NextResponse.json(
       {

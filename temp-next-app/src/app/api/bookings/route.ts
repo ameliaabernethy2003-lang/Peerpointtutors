@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData, writeJsonData } from '../../utils/db';
 
 function makeBookingId() {
   return `booking-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
@@ -20,24 +19,10 @@ export async function POST(request: NextRequest) {
 
     const bookingId = makeBookingId();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 2); // 2 hour expiry for pending bookings
+    expiresAt.setHours(expiresAt.getHours() + 2);
 
-    // Read existing bookings
-    const bookingsPath = join(process.cwd(), 'submissions', 'bookings.json');
-    let bookings: any[] = [];
-    
-    try {
-      const bookingsContent = await readFile(bookingsPath, 'utf-8');
-      bookings = JSON.parse(bookingsContent);
-      if (!Array.isArray(bookings)) {
-        bookings = [];
-      }
-    } catch {
-      // File doesn't exist, start with empty array
-      bookings = [];
-    }
+    const bookings: any[] = await readJsonData('bookings');
 
-    // Create new pending booking
     const tutorNameStr = String(tutorName);
     const newBooking = {
       bookingId,
@@ -47,23 +32,20 @@ export async function POST(request: NextRequest) {
       rate: rate || null,
       bookingUrl: String(bookingUrl),
       amount: parseFloat(amount),
-      status: 'pending', // pending, verified, expired, cancelled
-      paymentReference: tutorNameStr, // Payment reference is tutor name
+      status: 'pending',
+      paymentReference: tutorNameStr,
       createdAt: new Date().toISOString(),
       expiresAt: expiresAt.toISOString(),
       verifiedAt: null,
       verifiedBy: null,
     };
 
-    // Add to bookings array
     bookings.push(newBooking);
-
-    // Write back to file
-    await writeFile(bookingsPath, JSON.stringify(bookings, null, 2), 'utf-8');
+    await writeJsonData('bookings', bookings);
 
     return NextResponse.json(
-      { 
-        success: true, 
+      {
+        success: true,
         bookingId,
         paymentReference: newBooking.paymentReference,
         status: 'pending',
@@ -94,24 +76,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Read bookings from JSON file
-    const bookingsPath = join(process.cwd(), 'submissions', 'bookings.json');
-    let bookings: any[] = [];
-    
-    try {
-      const bookingsContent = await readFile(bookingsPath, 'utf-8');
-      bookings = JSON.parse(bookingsContent);
-      if (!Array.isArray(bookings)) {
-        bookings = [];
-      }
-    } catch {
-      return NextResponse.json(
-        { success: false, message: 'Booking not found' },
-        { status: 404 }
-      );
-    }
+    const bookings: any[] = await readJsonData('bookings');
 
-    // Find booking
     const booking = bookings.find(
       (b) => b.bookingId === bookingId || b.sessionId === sessionId
     );
@@ -126,11 +92,12 @@ export async function GET(request: NextRequest) {
     // Check if expired and update if needed
     const now = new Date();
     if (booking.status === 'pending' && new Date(booking.expiresAt) < now) {
-      const bookingIndex = bookings.findIndex((b) => b.bookingId === bookingId || b.sessionId === sessionId);
+      const bookingIndex = bookings.findIndex(
+        (b) => b.bookingId === bookingId || b.sessionId === sessionId
+      );
       if (bookingIndex !== -1) {
         bookings[bookingIndex].status = 'expired';
-        // Update file
-        await writeFile(bookingsPath, JSON.stringify(bookings, null, 2), 'utf-8');
+        await writeJsonData('bookings', bookings);
         booking.status = 'expired';
       }
     }

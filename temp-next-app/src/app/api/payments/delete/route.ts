@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData, writeJsonData } from '../../../utils/db';
 
-// Delete a payment
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -15,36 +13,18 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Read payments from JSON file
-    const paymentsPath = join(process.cwd(), 'submissions', 'payments.json');
-    let payments: any[] = [];
-    
-    try {
-      const paymentsContent = await readFile(paymentsPath, 'utf-8');
-      payments = JSON.parse(paymentsContent);
-      if (!Array.isArray(payments)) {
-        payments = [];
-      }
-    } catch {
-      return NextResponse.json(
-        { success: false, message: 'Payments file not found' },
-        { status: 404 }
-      );
-    }
-
-    // Find and remove payment
+    const payments: any[] = await readJsonData('payments');
     const initialLength = payments.length;
-    payments = payments.filter((p) => p.id !== paymentId);
+    const filtered = payments.filter((p) => p.id !== paymentId);
 
-    if (payments.length === initialLength) {
+    if (filtered.length === initialLength) {
       return NextResponse.json(
         { success: false, message: 'Payment not found' },
         { status: 404 }
       );
     }
 
-    // Write back to file
-    await writeFile(paymentsPath, JSON.stringify(payments, null, 2), 'utf-8');
+    await writeJsonData('payments', filtered);
 
     return NextResponse.json(
       { success: true, message: 'Payment deleted successfully' },

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData, writeJsonData } from '../../utils/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,43 +7,25 @@ export async function POST(request: NextRequest) {
     const { id, submittedAt, source, ...updatedFields } = tutorData;
 
     if (source === 'static') {
-      // For static tutors, store override in JSON file
-      const overridesPath = join(process.cwd(), 'submissions', 'tutor-overrides.json');
+      // For static tutors, store override
+      const overrides: Record<string, any> = await readJsonData('tutor-overrides') || {};
       
-      let overrides: Record<string, any> = {};
-      try {
-        const fileContent = await readFile(overridesPath, 'utf-8');
-        overrides = JSON.parse(fileContent);
-      } catch {
-        // File doesn't exist, start with empty object
-      }
+      // If it's an array (empty default), convert to object
+      const overridesObj = Array.isArray(overrides) ? {} : overrides;
 
-      // Update the override for this tutor
-      overrides[id] = {
-        ...overrides[id],
+      overridesObj[id] = {
+        ...overridesObj[id],
         ...updatedFields,
         updated_at: new Date().toISOString(),
       };
 
-      await writeFile(overridesPath, JSON.stringify(overrides, null, 2));
+      await writeJsonData('tutor-overrides', overridesObj);
 
       return NextResponse.json({ success: true }, { status: 200 });
     } else {
-      // For dynamic tutors, update the accepted-tutors.json file
-      const acceptedPath = join(process.cwd(), 'submissions', 'accepted-tutors.json');
-      
-      let acceptedTutors: any[] = [];
-      try {
-        const fileContent = await readFile(acceptedPath, 'utf-8');
-        acceptedTutors = JSON.parse(fileContent);
-      } catch {
-        return NextResponse.json(
-          { success: false, message: 'Tutor file not found' },
-          { status: 404 }
-        );
-      }
+      // For dynamic tutors, update the accepted-tutors list
+      const acceptedTutors: any[] = await readJsonData('accepted-tutors');
 
-      // Find and update the tutor by submittedAt
       const tutorIndex = acceptedTutors.findIndex(
         (tutor: any) => (tutor.submittedAt || tutor.submitted_at) === submittedAt
       );
@@ -56,13 +37,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Update the tutor
       acceptedTutors[tutorIndex] = {
         ...acceptedTutors[tutorIndex],
         ...updatedFields,
       };
 
-      await writeFile(acceptedPath, JSON.stringify(acceptedTutors, null, 2));
+      await writeJsonData('accepted-tutors', acceptedTutors);
 
       return NextResponse.json({ success: true }, { status: 200 });
     }

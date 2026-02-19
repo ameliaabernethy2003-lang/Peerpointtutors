@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData } from '../../utils/db';
 
 // Static tutors data (same as in page.tsx)
 const STATIC_TUTORS = [
@@ -63,39 +62,34 @@ const STATIC_TUTORS = [
 
 export async function GET() {
   try {
-    // Use JSON files directly (Supabase not configured)
     let removedNames = new Set<string>();
     let overrides: Record<string, any> = {};
     let acceptedTutors: any[] = [];
 
-    // Read removed tutors from JSON if it exists
+    // Read removed tutors
     try {
-      const removedPath = join(process.cwd(), 'submissions', 'removed-static-tutors.json');
-      const removedContent = await readFile(removedPath, 'utf-8');
-      const removedList = JSON.parse(removedContent);
+      const removedList = await readJsonData('removed-static-tutors');
       removedNames = new Set(Array.isArray(removedList) ? removedList : []);
     } catch {
-      // File doesn't exist, skip
+      // Skip
     }
 
-    // Read tutor overrides from JSON
+    // Read tutor overrides
     try {
-      const overridesPath = join(process.cwd(), 'submissions', 'tutor-overrides.json');
-      const overridesContent = await readFile(overridesPath, 'utf-8');
-      const overridesData = JSON.parse(overridesContent);
-      // Overrides are stored as { tutor_id: { ...overrideFields } }
-      Object.assign(overrides, overridesData);
+      const overridesData = await readJsonData('tutor-overrides');
+      if (overridesData && typeof overridesData === 'object' && !Array.isArray(overridesData)) {
+        Object.assign(overrides, overridesData);
+      }
     } catch {
-      // File doesn't exist, skip - will be created on first edit
+      // Skip
     }
 
-    // Read accepted tutors from JSON
+    // Read accepted tutors
     try {
-      const acceptedPath = join(process.cwd(), 'submissions', 'accepted-tutors.json');
-      const acceptedContent = await readFile(acceptedPath, 'utf-8');
-      acceptedTutors = JSON.parse(acceptedContent);
+      acceptedTutors = await readJsonData('accepted-tutors');
+      if (!Array.isArray(acceptedTutors)) acceptedTutors = [];
     } catch {
-      // File doesn't exist, skip
+      // Skip
     }
 
     // Transform static tutors with overrides and filter removed ones
@@ -141,7 +135,7 @@ export async function GET() {
     const tutorsBySchoolAndCollege: Record<string, Record<string, any[]>> = {};
 
     allTutors.forEach((tutor) => {
-      const school = tutor.school || 'University of Notre Dame'; // Default school
+      const school = tutor.school || 'University of Notre Dame';
       const college = tutor.college || 'Unknown';
       
       if (!tutorsBySchoolAndCollege[school]) {

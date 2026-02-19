@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData } from '../../../utils/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,28 +10,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('/');
     }
 
-    // Read sessions from JSON file
-    const sessionsPath = join(process.cwd(), 'submissions', 'payment-sessions.json');
-    let sessions: any[] = [];
-    
-    try {
-      const sessionsContent = await readFile(sessionsPath, 'utf-8');
-      sessions = JSON.parse(sessionsContent);
-      if (!Array.isArray(sessions)) {
-        sessions = [];
-      }
-    } catch {
-      return NextResponse.redirect('/');
-    }
-
-    // Find session by sessionId
+    const sessions: any[] = await readJsonData('payment-sessions');
     const session = sessions.find((s) => s.sessionId === sessionId);
 
     if (!session || !session.bookingUrl) {
       return NextResponse.redirect('/');
     }
 
-    // Redirect to the booking URL
     return NextResponse.redirect(session.bookingUrl);
   } catch (error) {
     console.error('Error redirecting to booking:', error);

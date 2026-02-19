@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData, writeJsonData } from '../../utils/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,22 +17,8 @@ export async function POST(request: NextRequest) {
     const platformFee = 2;
     const tutorAmount = Math.max(0, totalAmount - platformFee);
 
-    // Read existing payments
-    const paymentsPath = join(process.cwd(), 'submissions', 'payments.json');
-    let payments: any[] = [];
-    
-    try {
-      const paymentsContent = await readFile(paymentsPath, 'utf-8');
-      payments = JSON.parse(paymentsContent);
-      if (!Array.isArray(payments)) {
-        payments = [];
-      }
-    } catch {
-      // File doesn't exist, start with empty array
-      payments = [];
-    }
+    const payments: any[] = await readJsonData('payments');
 
-    // Create new payment record
     const payment = {
       id: `payment-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
       sessionId,
@@ -47,11 +32,8 @@ export async function POST(request: NextRequest) {
       paidOut: false,
     };
 
-    // Add to payments array
     payments.push(payment);
-
-    // Write back to file
-    await writeFile(paymentsPath, JSON.stringify(payments, null, 2), 'utf-8');
+    await writeJsonData('payments', payments);
 
     return NextResponse.json({ success: true, payment }, { status: 200 });
   } catch (error) {

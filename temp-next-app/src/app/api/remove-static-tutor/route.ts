@@ -1,25 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData, writeJsonData } from '../../utils/db';
 
 export async function POST(request: NextRequest) {
   try {
     const { name } = await request.json();
 
-    const removedPath = join(process.cwd(), 'submissions', 'removed-static-tutors.json');
-    
-    let removedTutors: string[] = [];
-    try {
-      const fileContent = await readFile(removedPath, 'utf-8');
-      removedTutors = JSON.parse(fileContent);
-    } catch {
-      // File doesn't exist, start with empty array
-    }
+    const removedTutors: string[] = await readJsonData('removed-static-tutors');
+    const removedList = Array.isArray(removedTutors) ? removedTutors : [];
 
-    // Add to removed list if not already there
-    if (!removedTutors.includes(name)) {
-      removedTutors.push(name);
-      await writeFile(removedPath, JSON.stringify(removedTutors, null, 2));
+    if (!removedList.includes(name)) {
+      removedList.push(name);
+      await writeJsonData('removed-static-tutors', removedList);
     }
 
     return NextResponse.json({ success: true }, { status: 200 });

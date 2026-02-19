@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { readJsonData } from '../../../utils/db';
 
-// Get booking URL from session (server-side only, for creating bookings)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -15,24 +13,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Read sessions from JSON file
-    const sessionsPath = join(process.cwd(), 'submissions', 'payment-sessions.json');
-    let sessions: any[] = [];
-    
-    try {
-      const sessionsContent = await readFile(sessionsPath, 'utf-8');
-      sessions = JSON.parse(sessionsContent);
-      if (!Array.isArray(sessions)) {
-        sessions = [];
-      }
-    } catch {
-      return NextResponse.json(
-        { success: false, message: 'Session not found' },
-        { status: 404 }
-      );
-    }
-
-    // Find session by sessionId
+    const sessions: any[] = await readJsonData('payment-sessions');
     const session = sessions.find((s) => s.sessionId === sessionId);
 
     if (!session || !session.bookingUrl) {
@@ -43,10 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      {
-        success: true,
-        bookingUrl: session.bookingUrl,
-      },
+      { success: true, bookingUrl: session.bookingUrl },
       { status: 200 }
     );
   } catch (error) {
