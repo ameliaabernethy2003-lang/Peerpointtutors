@@ -124,7 +124,7 @@ export async function GET() {
       accountingCourses: tutor.accountingCourses || tutor.accounting_courses || undefined,
       extracurriculars: tutor.extracurriculars,
       college: tutor.college,
-      school: tutor.school,
+      school: 'University of Notre Dame',
       submittedAt: tutor.submittedAt || tutor.submitted_at,
       id: tutor.id || `dynamic-${tutor.name}-${tutor.submittedAt || Date.now()}`,
       source: 'dynamic',
