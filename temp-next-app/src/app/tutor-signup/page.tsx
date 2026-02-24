@@ -118,6 +118,13 @@ export default function TutorSignupPage() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-3xl px-6 py-12 md:px-16">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-6"
+        >
+          <span className="text-sm leading-none">←</span>
+          <span>Back to Home</span>
+        </Link>
         {/* Image Space */}
         <div className="mb-8 flex justify-center">
           <div className="w-full max-w-2xl">

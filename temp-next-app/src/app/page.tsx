@@ -942,14 +942,25 @@ export default function Home() {
 
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between border-b border-neutral-200 bg-white/80 px-8 py-5 backdrop-blur-sm md:px-16">
-        <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setStep('hero');
+            setSelectedSchool(null);
+            setSelectedCollege(null);
+            setSelectedTutorIndex(null);
+            setSelectedExtracurricular(null);
+            setClassSearchQuery('');
+          }}
+          className="flex items-center gap-2 cursor-pointer"
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 text-[10px] font-semibold text-white">
             P2P
               </div>
           <span className="text-sm font-semibold uppercase tracking-[0.25em] text-neutral-600">
             PeerPointTutors
           </span>
-        </div>
+        </button>
         <div className="flex items-center gap-4">
           <div className="hidden text-xs font-medium uppercase tracking-[0.2em] text-neutral-500 md:block">
             Made for students. By students.
@@ -1031,6 +1042,14 @@ export default function Home() {
 
                 {step === 'school' && (
                   <div className="space-y-5">
+                    <button
+                      type="button"
+                      onClick={() => setStep('hero')}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Home</span>
+                    </button>
                     <h2 className="text-lg font-semibold text-neutral-900">
                       Which school are you at?
                     </h2>
@@ -1070,6 +1089,14 @@ export default function Home() {
 
                 {step === 'nd-colleges' && (
                   <div className="space-y-5">
+                    <button
+                      type="button"
+                      onClick={() => setStep('school')}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Schools</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         University of Notre Dame
@@ -1188,6 +1215,17 @@ export default function Home() {
 
                 {step === 'search-results' && (
                   <div className="space-y-5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setClassSearchQuery('');
+                        setStep('nd-colleges');
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         Search Results
@@ -1283,6 +1321,19 @@ export default function Home() {
 
                 {step === 'tutors' && selectedCollege === 'Mendoza College of Business' && (
                   <div className="space-y-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('nd-colleges');
+                        setSelectedCollege(null);
+                        setSelectedTutorIndex(null);
+                        setSelectedExtracurricular(null);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         {selectedSchool ?? 'University of Notre Dame'}
@@ -1490,6 +1541,19 @@ export default function Home() {
 
                 {step === 'tutors' && selectedCollege === 'College of Science' && (
                   <div className="space-y-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('nd-colleges');
+                        setSelectedCollege(null);
+                        setSelectedTutorIndex(null);
+                        setSelectedExtracurricular(null);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         {selectedSchool ?? 'University of Notre Dame'}
@@ -1640,6 +1704,19 @@ export default function Home() {
 
                 {step === 'tutors' && selectedCollege === 'College of Engineering' && (
                   <div className="space-y-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('nd-colleges');
+                        setSelectedCollege(null);
+                        setSelectedTutorIndex(null);
+                        setSelectedExtracurricular(null);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         {selectedSchool ?? 'University of Notre Dame'}
@@ -1790,6 +1867,19 @@ export default function Home() {
 
                 {step === 'tutors' && selectedCollege === 'College of Arts & Letters' && (
                   <div className="space-y-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('nd-colleges');
+                        setSelectedCollege(null);
+                        setSelectedTutorIndex(null);
+                        setSelectedExtracurricular(null);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         {selectedSchool ?? 'University of Notre Dame'}
@@ -1940,6 +2030,19 @@ export default function Home() {
 
                 {step === 'tutors' && selectedCollege === 'School of Architecture' && (
                   <div className="space-y-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('nd-colleges');
+                        setSelectedCollege(null);
+                        setSelectedTutorIndex(null);
+                        setSelectedExtracurricular(null);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         {selectedSchool ?? 'University of Notre Dame'}
@@ -2090,6 +2193,19 @@ export default function Home() {
 
                 {step === 'tutors' && selectedCollege !== 'Mendoza College of Business' && selectedCollege !== 'College of Science' && selectedCollege !== 'College of Engineering' && selectedCollege !== 'College of Arts & Letters' && selectedCollege !== 'School of Architecture' && (
                   <div className="space-y-5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('nd-colleges');
+                        setSelectedCollege(null);
+                        setSelectedTutorIndex(null);
+                        setSelectedExtracurricular(null);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 transition mb-1"
+                    >
+                      <span className="text-sm leading-none">←</span>
+                      <span>Back to Colleges</span>
+                    </button>
                     <div className="space-y-1">
                       <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
                         {selectedSchool ?? 'University of Notre Dame'}
