@@ -412,7 +412,7 @@ export default function AdminEditPage() {
     return total;
   };
 
-  // Filter tutors by first name using useMemo
+  // Filter tutors by name, college, or major using useMemo
   const filteredTutors = useMemo(() => {
     if (!tutorSearchQuery.trim()) {
       return allTutors;
@@ -426,8 +426,15 @@ export default function AdminEditPage() {
       
       Object.entries(colleges).forEach(([college, tutorList]) => {
         const filteredTutorList = tutorList.filter((tutor) => {
-          const firstName = tutor.name.split(' ')[0].toLowerCase();
-          return firstName === searchQuery;
+          const searchableText = [
+            tutor.name,
+            tutor.major,
+            tutor.college,
+            tutor.role || '',
+            tutor.company || '',
+            tutor.grade || '',
+          ].join(' ').toLowerCase();
+          return searchableText.includes(searchQuery);
         });
         
         if (filteredTutorList.length > 0) {
