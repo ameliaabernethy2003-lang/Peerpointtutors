@@ -15,6 +15,7 @@ type Submission = {
   college: string;
   majors: string;
   contactInformation: string;
+  phoneNumber: string;
   meetingPreference: string;
   classes: string;
   extracurriculars: string;
@@ -43,6 +44,7 @@ type Tutor = {
   id: string;
   submittedAt?: string;
   contactInformation?: string;
+  phoneNumber?: string;
   meetingPreference?: string;
   classes?: string;
   extracurriculars?: string;
@@ -454,6 +456,7 @@ export default function AdminEditPage() {
       venmoUsername: tutor.venmoUsername || '',
       college: tutor.college || '',
       contactInformation: tutor.contactInformation || '',
+      phoneNumber: tutor.phoneNumber || '',
       meetingPreference: tutor.meetingPreference || '',
       classes: tutor.classes || '',
       extracurriculars: tutor.extracurriculars || '',
@@ -1816,7 +1819,22 @@ export default function AdminEditPage() {
                       setEditFormData({ ...editFormData, contactInformation: e.target.value })
                     }
                     className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
-                    placeholder="Email or phone number"
+                    placeholder="Email address"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={(editFormData.phoneNumber as string) || ''}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, phoneNumber: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    placeholder="e.g., (555) 123-4567"
                   />
                 </div>
 

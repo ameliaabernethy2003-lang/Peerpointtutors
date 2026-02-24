@@ -14,6 +14,7 @@ export default function TutorSignupPage() {
     college: '',
     majors: '',
     contactInformation: '',
+    phoneNumber: '',
     meetingPreference: '',
     bookingUrl: '',
     venmoUsername: '',
@@ -80,6 +81,7 @@ export default function TutorSignupPage() {
           college: '',
           majors: '',
           contactInformation: '',
+          phoneNumber: '',
           meetingPreference: '',
           bookingUrl: '',
           venmoUsername: '',
@@ -302,6 +304,26 @@ export default function TutorSignupPage() {
             <p className="mt-1 text-xs text-neutral-500">
               The email you provide will be the email associated with your Google Calendar that you will make available for booking purposes.
             </p>
+          </div>
+
+          {/* Phone Number */}
+          <div>
+            <label
+              htmlFor="phoneNumber"
+              className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700"
+            >
+              Phone Number *
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              required
+              className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+              placeholder="e.g., (555) 123-4567"
+            />
           </div>
 
           {/* Meeting Preference */}

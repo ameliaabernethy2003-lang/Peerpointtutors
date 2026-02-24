@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
       school: 'University of Notre Dame',
       submittedAt: submission.submittedAt,
       contactInformation: submission.contactInformation || '',
+      phoneNumber: submission.phoneNumber || '',
     };
 
     acceptedTutors.push(newTutor);
