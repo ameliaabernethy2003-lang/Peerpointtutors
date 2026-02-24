@@ -523,17 +523,24 @@ const ARTS_LETTERS_TUTORS: Tutor[] = [
 
 // Helper function to extract primary major
 function getPrimaryMajor(major: string): string {
+  // Strip "Majors:" or "Major:" prefix
+  let cleaned = major.replace(/^Majors?:\s*/i, '').trim();
+  // Strip everything after "Minor:" or "Minors:"
+  cleaned = cleaned.replace(/\s*,?\s*Minors?:.*$/i, '').trim();
   // Handle different major formats
-  if (major.includes('&')) {
+  if (cleaned.includes('&')) {
     // For "Finance & Spanish" or "Finance & Psychology", take the first one
-    return major.split('&')[0].trim();
+    return cleaned.split('&')[0].trim();
   }
-  if (major.includes(',')) {
+  if (cleaned.includes(' and ')) {
+    return cleaned.split(' and ')[0].trim();
+  }
+  if (cleaned.includes(',')) {
     // For "Finance, Minor in Real Estate", take the part before the comma
-    return major.split(',')[0].trim();
+    return cleaned.split(',')[0].trim();
   }
   // For simple majors like "Accounting" or "Finance", return as is
-  return major;
+  return cleaned;
 }
 
 export default function Home() {
@@ -1292,7 +1299,7 @@ export default function Home() {
                       Calendar link to book.
                     </p>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
                       {Array.from({ length: Math.max(20, mergedMendozaTutors.length) }).map((_, index) => {
                         const tutor = mergedMendozaTutors[index];
                         const isSelected = selectedTutorIndex === index;
@@ -1301,7 +1308,7 @@ export default function Home() {
                             key={index}
                             type="button"
                             onClick={() => setSelectedTutorIndex(index)}
-                            className={`flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-center text-xs transition ${
+                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2 sm:px-2 sm:py-3 text-center text-[10px] sm:text-xs w-full min-w-0 transition ${
                               tutor?.imageSrc
                                 ? 'border-0 bg-transparent hover:opacity-80'
                                 : isSelected
@@ -1310,7 +1317,7 @@ export default function Home() {
                             }`}
                           >
                             {tutor?.imageSrc ? (
-                              <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
+                              <div className="relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
                                 <img
                                   src={tutor.imageSrc}
                                   alt={tutor.name}
@@ -1331,12 +1338,12 @@ export default function Home() {
                                 {index + 1}
                               </div>
                             )}
-                            <div className="flex flex-col items-center">
-                              <span className="truncate">
+                            <div className="flex flex-col items-center w-full min-w-0">
+                              <span className="truncate max-w-full">
                                 {tutor?.name ?? `Tutor ${index + 1}`}
                               </span>
                               {tutor?.grade && tutor?.major && (
-                                <span className="text-[10px] text-neutral-500">
+                                <span className="text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
                                   {getPrimaryMajor(tutor.major)}/{tutor.grade}
                                   {tutor?.rate && ` • $${calculateDisplayRate(tutor.rate)}/hr`}
                                 </span>
@@ -1499,7 +1506,7 @@ export default function Home() {
                       Calendar link to book.
                     </p>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
                       {Array.from({ length: Math.max(20, mergedScienceTutors.length) }).map((_, index) => {
                         const tutor = mergedScienceTutors[index];
                         const isSelected = selectedTutorIndex === index;
@@ -1508,7 +1515,7 @@ export default function Home() {
                             key={index}
                             type="button"
                             onClick={() => setSelectedTutorIndex(index)}
-                            className={`flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-center text-xs transition ${
+                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2 sm:px-2 sm:py-3 text-center text-[10px] sm:text-xs w-full min-w-0 transition ${
                               tutor?.imageSrc
                                 ? 'border-0 bg-transparent hover:opacity-80'
                                 : isSelected
@@ -1517,7 +1524,7 @@ export default function Home() {
                             }`}
                           >
                             {tutor?.imageSrc ? (
-                              <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
+                              <div className="relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
                                 <img
                                   src={tutor.imageSrc}
                                   alt={tutor.name}
@@ -1538,12 +1545,12 @@ export default function Home() {
                                 {index + 1}
                               </div>
                             )}
-                            <div className="flex flex-col items-center">
-                              <span className="truncate">
+                            <div className="flex flex-col items-center w-full min-w-0">
+                              <span className="truncate max-w-full">
                                 {tutor?.name ?? `Tutor ${index + 1}`}
                               </span>
                               {tutor?.grade && tutor?.major && (
-                                <span className="text-[10px] text-neutral-500">
+                                <span className="text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
                                   {getPrimaryMajor(tutor.major)}/{tutor.grade}
                                   {tutor?.rate && ` • $${calculateDisplayRate(tutor.rate)}/hr`}
                                 </span>
@@ -1649,7 +1656,7 @@ export default function Home() {
                       Calendar link to book.
                     </p>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
                       {Array.from({ length: Math.max(20, mergedEngineeringTutors.length) }).map((_, index) => {
                         const tutor = mergedEngineeringTutors[index];
                         const isSelected = selectedTutorIndex === index;
@@ -1658,7 +1665,7 @@ export default function Home() {
                             key={index}
                             type="button"
                             onClick={() => setSelectedTutorIndex(index)}
-                            className={`flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-center text-xs transition ${
+                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2 sm:px-2 sm:py-3 text-center text-[10px] sm:text-xs w-full min-w-0 transition ${
                               tutor?.imageSrc
                                 ? 'border-0 bg-transparent hover:opacity-80'
                                 : isSelected
@@ -1667,7 +1674,7 @@ export default function Home() {
                             }`}
                           >
                             {tutor?.imageSrc ? (
-                              <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
+                              <div className="relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
                                 <img
                                   src={tutor.imageSrc}
                                   alt={tutor.name}
@@ -1688,12 +1695,12 @@ export default function Home() {
                                 {index + 1}
                               </div>
                             )}
-                            <div className="flex flex-col items-center">
-                              <span className="truncate">
+                            <div className="flex flex-col items-center w-full min-w-0">
+                              <span className="truncate max-w-full">
                                 {tutor?.name ?? `Tutor ${index + 1}`}
                               </span>
                               {tutor?.grade && tutor?.major && (
-                                <span className="text-[10px] text-neutral-500">
+                                <span className="text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
                                   {getPrimaryMajor(tutor.major)}/{tutor.grade}
                                   {tutor?.rate && ` • $${calculateDisplayRate(tutor.rate)}/hr`}
                                 </span>
@@ -1799,7 +1806,7 @@ export default function Home() {
                       Calendar link to book.
                     </p>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
                       {Array.from({ length: Math.max(20, mergedArtsLettersTutors.length) }).map((_, index) => {
                         const tutor = mergedArtsLettersTutors[index];
                         const isSelected = selectedTutorIndex === index;
@@ -1808,7 +1815,7 @@ export default function Home() {
                             key={index}
                             type="button"
                             onClick={() => setSelectedTutorIndex(index)}
-                            className={`flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-center text-xs transition ${
+                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2 sm:px-2 sm:py-3 text-center text-[10px] sm:text-xs w-full min-w-0 transition ${
                               tutor?.imageSrc
                                 ? 'border-0 bg-transparent hover:opacity-80'
                                 : isSelected
@@ -1817,7 +1824,7 @@ export default function Home() {
                             }`}
                           >
                             {tutor?.imageSrc ? (
-                              <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
+                              <div className="relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
                                 <img
                                   src={tutor.imageSrc}
                                   alt={tutor.name}
@@ -1838,12 +1845,12 @@ export default function Home() {
                                 {index + 1}
                               </div>
                             )}
-                            <div className="flex flex-col items-center">
-                              <span className="truncate">
+                            <div className="flex flex-col items-center w-full min-w-0">
+                              <span className="truncate max-w-full">
                                 {tutor?.name ?? `Tutor ${index + 1}`}
                               </span>
                               {tutor?.grade && tutor?.major && (
-                                <span className="text-[10px] text-neutral-500">
+                                <span className="text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
                                   {getPrimaryMajor(tutor.major)}/{tutor.grade}
                                   {tutor?.rate && ` • $${calculateDisplayRate(tutor.rate)}/hr`}
                                 </span>
@@ -1949,7 +1956,7 @@ export default function Home() {
                       Calendar link to book.
                     </p>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
                       {Array.from({ length: Math.max(20, mergedArchitectureTutors.length) }).map((_, index) => {
                         const tutor = mergedArchitectureTutors[index];
                         const isSelected = selectedTutorIndex === index;
@@ -1958,7 +1965,7 @@ export default function Home() {
                             key={index}
                             type="button"
                             onClick={() => setSelectedTutorIndex(index)}
-                            className={`flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-center text-xs transition ${
+                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2 sm:px-2 sm:py-3 text-center text-[10px] sm:text-xs w-full min-w-0 transition ${
                               tutor?.imageSrc
                                 ? 'border-0 bg-transparent hover:opacity-80'
                                 : isSelected
@@ -1967,7 +1974,7 @@ export default function Home() {
                             }`}
                           >
                             {tutor?.imageSrc ? (
-                              <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
+                              <div className="relative h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
                                 <img
                                   src={tutor.imageSrc}
                                   alt={tutor.name}
@@ -1988,12 +1995,12 @@ export default function Home() {
                                 {index + 1}
                               </div>
                             )}
-                            <div className="flex flex-col items-center">
-                              <span className="truncate">
+                            <div className="flex flex-col items-center w-full min-w-0">
+                              <span className="truncate max-w-full">
                                 {tutor?.name ?? `Tutor ${index + 1}`}
                               </span>
                               {tutor?.grade && tutor?.major && (
-                                <span className="text-[10px] text-neutral-500">
+                                <span className="text-[9px] sm:text-[10px] text-neutral-500 leading-tight">
                                   {getPrimaryMajor(tutor.major)}/{tutor.grade}
                                   {tutor?.rate && ` • $${calculateDisplayRate(tutor.rate)}/hr`}
                                 </span>
