@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { calculateDisplayRate } from '../../utils/rateCalculator';
 
@@ -68,6 +68,7 @@ export default function AdminEditPage() {
   const [editingTutor, setEditingTutor] = useState<Tutor | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Tutor>>({});
   const [tutorSearchQuery, setTutorSearchQuery] = useState<string>('');
+  const [expandedTutorId, setExpandedTutorId] = useState<string | null>(null);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -824,81 +825,157 @@ export default function AdminEditPage() {
                           <table className="w-full">
                             <thead className="bg-neutral-50">
                               <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
                                   Photo
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
                                   Name
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
                                   Major
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
                                   Grade
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
                                   Rate
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
+                                  Contact
+                                </th>
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-700">
                                   Actions
                                 </th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-200">
                               {tutors.map((tutor) => (
-                                <tr key={tutor.id} className="hover:bg-neutral-50">
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    {tutor.imageSrc ? (
-                                      <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-neutral-200">
-                                        <img
-                                          src={tutor.imageSrc}
-                                          alt={tutor.name}
-                                          className="h-full w-full object-cover"
-                                        />
+                                <React.Fragment key={tutor.id}>
+                                  <tr className="hover:bg-neutral-50">
+                                    <td className="px-4 py-4 whitespace-nowrap">
+                                      {tutor.imageSrc ? (
+                                        <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-neutral-200">
+                                          <img
+                                            src={tutor.imageSrc}
+                                            alt={tutor.name}
+                                            className="h-full w-full object-cover"
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div className="h-12 w-12 rounded-full bg-neutral-200 flex items-center justify-center">
+                                          <span className="text-xs text-neutral-500">No photo</span>
+                                        </div>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4">
+                                      <div className="text-sm font-medium text-neutral-900">
+                                        {tutor.name}
                                       </div>
-                                    ) : (
-                                      <div className="h-12 w-12 rounded-full bg-neutral-200 flex items-center justify-center">
-                                        <span className="text-xs text-neutral-500">No photo</span>
+                                      {tutor.role && (
+                                        <div className="text-xs text-neutral-500">
+                                          {tutor.role}
+                                          {tutor.company && ` at ${tutor.company}`}
+                                        </div>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-neutral-600">
+                                      {tutor.major}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-neutral-600">
+                                      {tutor.grade || '-'}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-neutral-600">
+                                      {tutor.rate ? `$${calculateDisplayRate(tutor.rate)}/hr` : '-'}
+                                    </td>
+                                    <td className="px-4 py-4 text-xs text-neutral-600">
+                                      {tutor.contactInformation && (
+                                        <div>{tutor.contactInformation}</div>
+                                      )}
+                                      {tutor.phoneNumber && (
+                                        <div>{tutor.phoneNumber}</div>
+                                      )}
+                                      {!tutor.contactInformation && !tutor.phoneNumber && '-'}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setExpandedTutorId(expandedTutorId === tutor.id ? null : tutor.id)}
+                                          className="text-neutral-600 hover:text-neutral-800 font-medium"
+                                        >
+                                          {expandedTutorId === tutor.id ? 'Hide' : 'View'}
+                                        </button>
+                                        <button
+                                          onClick={() => handleEditTutor(tutor)}
+                                          className="text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteTutor(tutor)}
+                                          className="text-red-600 hover:text-red-800 font-medium"
+                                        >
+                                          Remove
+                                        </button>
                                       </div>
-                                    )}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-neutral-900">
-                                      {tutor.name}
-                                    </div>
-                                    {tutor.role && (
-                                      <div className="text-xs text-neutral-500">
-                                        {tutor.role}
-                                        {tutor.company && ` at ${tutor.company}`}
-                                      </div>
-                                    )}
-                                  </td>
-                                  <td className="px-6 py-4 text-sm text-neutral-600">
-                                    {tutor.major}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600">
-                                    {tutor.grade || '-'}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600">
-                                    {tutor.rate ? `$${calculateDisplayRate(tutor.rate)}/hr` : '-'}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div className="flex gap-2">
-                                      <button
-                                        onClick={() => handleEditTutor(tutor)}
-                                        className="text-blue-600 hover:text-blue-800 font-medium"
-                                      >
-                                        Edit
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteTutor(tutor)}
-                                        className="text-red-600 hover:text-red-800 font-medium"
-                                      >
-                                        Remove
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
+                                    </td>
+                                  </tr>
+                                  {expandedTutorId === tutor.id && (
+                                    <tr>
+                                      <td colSpan={7} className="px-4 py-4 bg-neutral-50">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">College</p>
+                                            <p className="text-neutral-900">{tutor.college || '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Grade</p>
+                                            <p className="text-neutral-900">{tutor.grade || '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Major</p>
+                                            <p className="text-neutral-900">{tutor.major || '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Role / Internship</p>
+                                            <p className="text-neutral-900">{tutor.role || '-'}{tutor.company ? ` at ${tutor.company}` : ''}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Rate</p>
+                                            <p className="text-neutral-900">{tutor.rate ? `$${tutor.rate}/hr (students see $${calculateDisplayRate(tutor.rate)}/hr)` : '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Email</p>
+                                            <p className="text-neutral-900">{tutor.contactInformation || '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Phone</p>
+                                            <p className="text-neutral-900">{tutor.phoneNumber || '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Meeting Preference</p>
+                                            <p className="text-neutral-900">{tutor.meetingPreference || '-'}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Venmo</p>
+                                            <p className="text-neutral-900">{tutor.venmoUsername || '-'}</p>
+                                          </div>
+                                          <div className="col-span-2 md:col-span-3">
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Booking Link</p>
+                                            <p className="text-neutral-900 break-all">{tutor.bookingUrl || '-'}</p>
+                                          </div>
+                                          <div className="col-span-2 md:col-span-3">
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Classes</p>
+                                            <p className="text-neutral-900">{tutor.classes || (tutor.coreCourses || tutor.financeCourses || tutor.accountingCourses ? [...(tutor.coreCourses || []), ...(tutor.financeCourses || []), ...(tutor.accountingCourses || [])].join(', ') : '-')}</p>
+                                          </div>
+                                          <div className="col-span-2 md:col-span-3">
+                                            <p className="font-semibold text-neutral-500 uppercase tracking-wider mb-1">Extracurriculars</p>
+                                            <p className="text-neutral-900">{tutor.extracurriculars || '-'}</p>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </React.Fragment>
                               ))}
                             </tbody>
                           </table>
