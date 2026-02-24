@@ -42,6 +42,13 @@ type Tutor = {
   source: string;
   id: string;
   submittedAt?: string;
+  contactInformation?: string;
+  meetingPreference?: string;
+  classes?: string;
+  extracurriculars?: string;
+  coreCourses?: string[];
+  financeCourses?: string[];
+  accountingCourses?: string[];
 };
 
 const ADMIN_PASSWORD = 'SG&A2026!';
@@ -445,6 +452,11 @@ export default function AdminEditPage() {
       rate: tutor.rate || '',
       bookingUrl: tutor.bookingUrl || '',
       venmoUsername: tutor.venmoUsername || '',
+      college: tutor.college || '',
+      contactInformation: tutor.contactInformation || '',
+      meetingPreference: tutor.meetingPreference || '',
+      classes: tutor.classes || '',
+      extracurriculars: tutor.extracurriculars || '',
     });
   };
 
@@ -1621,8 +1633,8 @@ export default function AdminEditPage() {
         {/* Edit Modal */}
         {editingTutor && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-2xl rounded-xl border border-neutral-200 bg-white p-6 shadow-lg">
-              <div className="mb-6 flex items-center justify-between">
+            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-neutral-200 bg-white p-6 shadow-lg">
+              <div className="mb-6 flex items-center justify-between sticky top-0 bg-white pb-2 border-b border-neutral-100">
                 <h2 className="text-xl font-semibold text-neutral-900">
                   Edit Tutor: {editingTutor.name}
                 </h2>
@@ -1668,7 +1680,27 @@ export default function AdminEditPage() {
 
                 <div>
                   <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
-                    Role
+                    College
+                  </label>
+                  <select
+                    value={editFormData.college || ''}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, college: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                  >
+                    <option value="">Select college</option>
+                    <option value="Mendoza College of Business">Mendoza College of Business</option>
+                    <option value="College of Science">College of Science</option>
+                    <option value="College of Engineering">College of Engineering</option>
+                    <option value="College of Arts & Letters">College of Arts & Letters</option>
+                    <option value="School of Architecture">School of Architecture</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
+                    Role / Internship
                   </label>
                   <input
                     type="text"
@@ -1677,6 +1709,7 @@ export default function AdminEditPage() {
                       setEditFormData({ ...editFormData, role: e.target.value })
                     }
                     className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    placeholder="e.g., Incoming Investment Banking Analyst"
                   />
                 </div>
 
@@ -1691,6 +1724,7 @@ export default function AdminEditPage() {
                       setEditFormData({ ...editFormData, company: e.target.value })
                     }
                     className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    placeholder="e.g., Goldman Sachs"
                   />
                 </div>
 
@@ -1743,6 +1777,69 @@ export default function AdminEditPage() {
 
                 <div>
                   <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
+                    Classes / Courses
+                  </label>
+                  <textarea
+                    value={editFormData.classes || ''}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, classes: e.target.value })
+                    }
+                    rows={3}
+                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    placeholder="List classes they can tutor (comma-separated)"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
+                    Extracurriculars
+                  </label>
+                  <textarea
+                    value={editFormData.extracurriculars || ''}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, extracurriculars: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    placeholder="e.g., Finance Club, SIBC"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
+                    Contact Information
+                  </label>
+                  <input
+                    type="text"
+                    value={(editFormData.contactInformation as string) || ''}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, contactInformation: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                    placeholder="Email or phone number"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
+                    Meeting Preference
+                  </label>
+                  <select
+                    value={(editFormData.meetingPreference as string) || ''}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, meetingPreference: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                  >
+                    <option value="">Select preference</option>
+                    <option value="In-person">In-person</option>
+                    <option value="Virtual">Virtual</option>
+                    <option value="Both">Both</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-700">
                     Google Calendar Booking Link
                   </label>
                   <input
@@ -1755,7 +1852,7 @@ export default function AdminEditPage() {
                     placeholder="Paste the tutor's Google Calendar appointment schedule link"
                   />
                   <p className="mt-1 text-xs text-neutral-500">
-                    This is the link students will open when they click "Open Google Calendar booking".
+                    This is the link students will open when they click &quot;Open Google Calendar booking&quot;.
                   </p>
                 </div>
 
