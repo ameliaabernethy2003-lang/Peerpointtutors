@@ -122,7 +122,7 @@ export default function TutorSignupPage() {
         <div className="mb-8 flex justify-center">
           <div className="w-full max-w-2xl">
             <img
-              src="/Pictureforform.png"
+              src="/Mendoza College of Business tutors.png"
               alt="Tutor Signup"
               className="w-full h-auto rounded-lg"
             />
